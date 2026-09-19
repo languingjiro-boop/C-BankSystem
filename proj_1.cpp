@@ -77,6 +77,7 @@ int main()
 {
     srand(time(NULL));
     ATMsimulator atm;
+    atm.load();
     while (1)
     {
         switch (menu())
@@ -237,7 +238,7 @@ bool ATMsimulator::login(Node *&accRef)
         cin.clear();
         cin.ignore(1000, '\n');
     }
-    cin.ignore();
+    cin.ignore(1000, '\n');
 
     cout << GREEN << "Enter Pin Code: " << RESET;
     getline(cin, pin);
@@ -308,6 +309,7 @@ void ATMsimulator::Transaction()
             changePin(acc);
             break;
         case 6:
+            save();
             return; // Exit the transaction menu
         default:
             cout << RED << "Invalid choice. Please try again.\n"
@@ -341,6 +343,7 @@ void ATMsimulator::deposit(Node *acc)
     cout << fixed << setprecision(2);
     cout << GREEN << "\nDeposit successful!\n";
     cout << "New balance: PHP " << RESET << acc->data.balance << endl;
+    save();
     system("pause");
 }
 
@@ -352,9 +355,11 @@ void ATMsimulator::withdraw(Node *acc)
     cout << "                    WITHDRAW\n";
     cout << "===================================================\n";
     cout << GREEN << "Enter amount to withdraw: PHP " << RESET;
-    while (!(cin >> amount) || amount < 1000 || amount > acc->data.balance)
+    while (!(cin >> amount) || amount < 1000 || amount > acc->data.balance || (acc->data.balance - amount) < 5000)
     {
-        cout << RED << "Invalid amount!\nMinimum withdraw amount is PHP 1000 or amount is greater than balance of PHP " << RESET << acc->data.balance << endl;
+        cout << RED << "Invalid amount!\nMinimum withdraw amount is PHP 1000 or amount is greater than balance of PHP " << setprecision(2) << RESET << acc->data.balance << endl;
+        cout << RED << "Also you must maintain your balance above PHP 5000\n"
+             << RESET;
         cout << GREEN << "Enter amount: PHP " << RESET;
         cin.clear();
         cin.ignore(1000, '\n');
@@ -368,6 +373,7 @@ void ATMsimulator::withdraw(Node *acc)
          << RESET;
     cout << GREEN << "You withdrew PHP " << RESET << amount;
     cout << GREEN << "\nNew balance: PHP " << RESET << acc->data.balance << endl;
+    save();
     system("pause");
 }
 
@@ -398,7 +404,7 @@ void ATMsimulator::changePin(Node *acc)
     cin.ignore(1000, '\n');
     while (tries > 0 && !match)
     {
-        cout << "Enter Old Pin Code: ";
+        cout << "\nEnter Old Pin Code: ";
         getline(cin, oldPin);
         if (oldPin == acc->data.pinCode)
             match = true;
@@ -425,6 +431,7 @@ void ATMsimulator::changePin(Node *acc)
 
     acc->data.pinCode = newPin;
     cout << "\nPin change successful!\n";
+    save();
     system("pause");
 }
 
@@ -439,9 +446,15 @@ void ATMsimulator::save()
     }
     else
     {
+        file << fixed << setprecision(2);
         while (p != NULL)
         {
-            file << p->data.accName << "," << p->data.accNumber << "," << p->data.balance << "," << p->data.birthday << "," << p->data.contactNum << "," << p->data.pinCode;
+            file << p->data.accName << ","
+                 << p->data.accNumber << ","
+                 << p->data.balance << ","
+                 << p->data.birthday << ","
+                 << p->data.contactNum << ","
+                 << p->data.pinCode << "\n";
             p = p->next;
         }
     }
@@ -450,7 +463,7 @@ void ATMsimulator::save()
 
 void ATMsimulator::load()
 {
-    ifstream file("Link_Accounts.csv");
+    ifstream file("List_Accounts.csv");
     if (!file)
     {
         cout << "File Error.\n";
