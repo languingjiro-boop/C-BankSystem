@@ -231,7 +231,7 @@ bool ATMsimulator::login(Node *&accRef)
     int accNum;
     string pin;
 
-    cout << "Enter Account Number: ";
+    cout << GREEN << "\nEnter Account Number: " << RESET;
     while (!(cin >> accNum))
     {
         cout << RED << "Invalid input. Enter a number: " << RESET;
@@ -350,11 +350,22 @@ void ATMsimulator::deposit(Node *acc)
 void ATMsimulator::withdraw(Node *acc)
 {
     double amount;
+
     system("cls");
     cout << "===================================================\n";
     cout << "                    WITHDRAW\n";
     cout << "===================================================\n";
+    if (acc->data.balance - 5000 < 1000)
+    {
+        cout << RED << "Insufficient available balance.\n"
+             << "You must maintain PHP 5000 and the minimum withdrawal is PHP 1000.\n"
+             << RESET;
+        system("pause");
+        return;
+    }
+
     cout << GREEN << "Enter amount to withdraw: PHP " << RESET;
+
     while (!(cin >> amount) || amount < 1000 || amount > acc->data.balance || (acc->data.balance - amount) < 5000)
     {
         cout << RED << "Invalid amount!\nMinimum withdraw amount is PHP 1000 or amount is greater than balance of PHP " << fixed << setprecision(2) << RESET << acc->data.balance << endl;
