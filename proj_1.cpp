@@ -357,8 +357,8 @@ void ATMsimulator::withdraw(Node *acc)
     cout << GREEN << "Enter amount to withdraw: PHP " << RESET;
     while (!(cin >> amount) || amount < 1000 || amount > acc->data.balance || (acc->data.balance - amount) < 5000)
     {
-        cout << RED << "Invalid amount!\nMinimum withdraw amount is PHP 1000 or amount is greater than balance of PHP " << setprecision(2) << RESET << acc->data.balance << endl;
-        cout << RED << "Also you must maintain your balance above PHP 5000\n"
+        cout << RED << "Invalid amount!\nMinimum withdraw amount is PHP 1000 or amount is greater than balance of PHP " << fixed << setprecision(2) << RESET << acc->data.balance << endl;
+        cout << RED << "Also you must maintain your balance at PHP 5000\n"
              << RESET;
         cout << GREEN << "Enter amount: PHP " << RESET;
         cin.clear();
